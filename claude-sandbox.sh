@@ -5,8 +5,15 @@ DOCKER_IMAGE="tartale/claude-sandbox:local"
 CONTAINER_NAME="claude-sandbox-$(basename "$(pwd)")-$(openssl rand -hex 2)"
 echo "Starting container: $CONTAINER_NAME"
 
+case "$(uname -m)" in
+    x86_64)  PLATFORM="linux/amd64" ;;
+    aarch64) PLATFORM="linux/arm64" ;;
+    *)       PLATFORM="linux/$(uname -m)" ;;
+esac
+
 if [ -f "$HOME/.claude.json" ]; then
     docker run --rm \
+        --platform "$PLATFORM" \
         -v claude-home:/home/node \
         -v "$HOME/.claude.json:/tmp/.claude.json:ro" \
         -v "$HOME/.claude:/tmp/.claude:ro" \
@@ -17,6 +24,7 @@ if [ -f "$HOME/.claude.json" ]; then
 fi
 
 docker run -it --rm \
+    --platform "$PLATFORM" \
     --network=host \
     --name "$CONTAINER_NAME" \
     -e GITHUB_TOKEN \
