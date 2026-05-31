@@ -14,7 +14,8 @@ clean:
 	docker volume rm claude-home 2>/dev/null || true
 
 image:
-	docker build -t $(DOCKER_IMAGE) .
+	docker buildx inspect multi-platform >/dev/null 2>&1 || docker buildx create --name multi-platform --driver docker-container --use
+	docker buildx build --builder multi-platform --platform linux/amd64,linux/arm64 -t $(DOCKER_IMAGE) .
 
 login:
 	docker run --rm \
@@ -33,8 +34,7 @@ run-bg:
 	docker run -d $(DOCKER_RUN_ARGS) $(DOCKER_IMAGE)
 
 push:
-	docker buildx inspect multi-platform >/dev/null 2>&1 || docker buildx create --name multi-platform --driver docker-container --use
-	docker buildx build --builder multi-platform --platform linux/amd64,linux/arm64 -t $(DOCKER_IMAGE) --push .
+	docker push $(DOCKER_IMAGE)
 
 shell:
 	docker run -it $(DOCKER_RUN_ARGS) $(DOCKER_IMAGE) /bin/bash
