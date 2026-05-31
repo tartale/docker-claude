@@ -8,11 +8,13 @@ fi
 
 node -e "
 const fs = require('fs');
-const cfg = JSON.parse(fs.readFileSync('/home/node/.claude.json', 'utf8'));
+const cfgPath = '/home/node/.claude.json';
+let cfg = {};
+try { cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8')); } catch(e) {}
 if (!cfg.projects) cfg.projects = {};
 if (!cfg.projects['/workspace']) cfg.projects['/workspace'] = {};
 cfg.projects['/workspace'].hasTrustDialogAccepted = true;
-fs.writeFileSync('/home/node/.claude.json', JSON.stringify(cfg));
+fs.writeFileSync(cfgPath, JSON.stringify(cfg));
 "
 
 exec claude --dangerously-skip-permissions "$@"

@@ -32,8 +32,9 @@ run:
 run-bg:
 	docker run -d $(DOCKER_RUN_ARGS) $(DOCKER_IMAGE)
 
-push: image
-	docker push $(DOCKER_IMAGE)
+push:
+	docker buildx inspect multi-platform >/dev/null 2>&1 || docker buildx create --name multi-platform --driver docker-container --use
+	docker buildx build --builder multi-platform --platform linux/amd64,linux/arm64 -t $(DOCKER_IMAGE) --push .
 
 shell:
 	docker run -it $(DOCKER_RUN_ARGS) $(DOCKER_IMAGE) /bin/bash
