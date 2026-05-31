@@ -8,7 +8,7 @@ fi
 
 node -e "
 const fs = require('fs');
-const cfgPath = '/home/node/.claude.json';
+const cfgPath = process.env.HOME + '/.claude.json';
 let cfg = {};
 try { cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8')); } catch(e) {}
 if (!cfg.projects) cfg.projects = {};
