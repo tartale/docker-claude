@@ -1,8 +1,17 @@
 #!/bin/bash
 set -e
 
-usermod -u "${CUID}" claude || true
-groupmod -g "${CGID}" claude || true
+existing_group=$(getent group "${CGID}" 2>/dev/null | cut -d: -f1)
+if [ -n "$existing_group" ] && [ "$existing_group" != "claude" ]; then
+    groupmod -g "$(awk -F: 'BEGIN{max=65000} $3>max{max=$3} END{print max+1}' /etc/group)" "$existing_group"
+fi
+groupmod -g "${CGID}" claude
+
+existing_user=$(getent passwd "${CUID}" 2>/dev/null | cut -d: -f1)
+if [ -n "$existing_user" ] && [ "$existing_user" != "claude" ]; then
+    usermod -u "$(awk -F: 'BEGIN{max=65000} $3>max{max=$3} END{print max+1}' /etc/passwd)" "$existing_user"
+fi
+usermod -u "${CUID}" claude
 
 su -m -s /bin/bash claude << 'EOF'
 set -e
