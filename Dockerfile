@@ -20,7 +20,6 @@ WORKDIR /workspace
 RUN chown claude:claude /workspace
 
 COPY --chmod=a+x entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY --chmod=a+x start.sh /usr/local/bin/start.sh
 
 ENV UID=1000
 ENV GID=1000
