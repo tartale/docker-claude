@@ -28,7 +28,8 @@ docker run -it --rm \
   --platform "$PLATFORM" \
   --network=host \
   --name "$CONTAINER_NAME" \
-  --group-add "$(id -g)" \
+  -e UID="$(id -u)" \
+  -e GID="$(id -g)" \
   -e GITHUB_TOKEN \
   -v "$(pwd):/workspace" \
   -v "$HOME/.claude.json:/home/claude/.claude.json" \
