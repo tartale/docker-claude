@@ -11,15 +11,12 @@ RUN npm install -g @anthropic-ai/claude-code
 
 # Rename the default 'node' user/group to 'claude'
 RUN usermod -l claude -d /home/claude -m node \
- && groupmod -n claude node \
- && groupadd wheel \
- && usermod -G wheel claude \
- && echo 'permit nopass :wheel' >> /etc/doas.conf
+ && groupmod -n claude node
 
 WORKDIR /workspace
 RUN chown claude:claude /workspace
 
-COPY --chmod=a+x entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENV CUID=1000
 ENV CGID=1000
