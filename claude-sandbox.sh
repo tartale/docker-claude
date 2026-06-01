@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-DOCKER_IMAGE="tartale/claude-sandbox:local"
+DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG:-latest}
+DOCKER_IMAGE="tartale/claude-sandbox:${DOCKER_IMAGE_TAG}"
 CONTAINER_NAME="claude-sandbox-$(basename "$(pwd)")-$(openssl rand -hex 2)"
 echo "Starting container: $CONTAINER_NAME"
 

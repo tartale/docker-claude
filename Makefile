@@ -18,5 +18,7 @@ pull:
 
 push:
 	docker push $(DOCKER_IMAGE)
+	docker tag $(DOCKER_IMAGE) tartale/claude-sandbox:latest
+	docker push tartale/claude-sandbox:latest
 
 .PHONY: clean image pull push
