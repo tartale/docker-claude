@@ -20,7 +20,9 @@ umask ${CMASK}
 
 printf '[url "https://github.com/"]\n\tinsteadOf = git@github.com:\n' > /tmp/gitconfig
 if [ -n "$GITHUB_TOKEN" ]; then
-    printf '[credential "https://github.com"]\n\thelper = !f() { echo username=x-access-token; echo password=%s; }; f\n' "$GITHUB_TOKEN" >> /tmp/gitconfig
+    printf '#!/bin/sh\necho username=x-access-token\necho password=%s\n' "$GITHUB_TOKEN" > /tmp/git-credential-github-token
+    chmod +x /tmp/git-credential-github-token
+    printf '[credential "https://github.com"]\n\thelper = /tmp/git-credential-github-token\n' >> /tmp/gitconfig
 fi
 export GIT_CONFIG_GLOBAL=/tmp/gitconfig
 
