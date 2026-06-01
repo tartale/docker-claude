@@ -18,7 +18,6 @@ RUN chown claude:claude /workspace
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ENV GITHUB_TOKEN=""
 ENV CUID=1000
 ENV CGID=1000
 ENV CMASK=0002
