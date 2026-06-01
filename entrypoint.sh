@@ -18,10 +18,11 @@ set -e
 export HOME=/home/claude
 umask ${UMASK}
 
+printf '[url "https://github.com/"]\n\tinsteadOf = git@github.com:\n' > /tmp/gitconfig
 if [ -n "$GITHUB_TOKEN" ]; then
-    printf '[credential "https://github.com"]\n\thelper = !f() { echo username=x-access-token; echo password=%s; }; f\n' "$GITHUB_TOKEN" > /tmp/gitconfig
-    export GIT_CONFIG_GLOBAL=/tmp/gitconfig
+    printf '[credential "https://github.com"]\n\thelper = !f() { echo username=x-access-token; echo password=%s; }; f\n' "$GITHUB_TOKEN" >> /tmp/gitconfig
 fi
+export GIT_CONFIG_GLOBAL=/tmp/gitconfig
 
 node -e "
 const fs = require('fs');
