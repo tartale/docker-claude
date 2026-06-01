@@ -16,7 +16,7 @@ usermod -u "${CUID}" claude
 su -m -s /bin/bash claude << 'EOF'
 set -e
 export HOME=/home/claude
-umask ${UMASK}
+umask ${CMASK}
 
 printf '[url "https://github.com/"]\n\tinsteadOf = git@github.com:\n' > /tmp/gitconfig
 if [ -n "$GITHUB_TOKEN" ]; then

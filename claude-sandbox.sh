@@ -31,7 +31,7 @@ docker run -it --rm \
   --name "$CONTAINER_NAME" \
   -e CUID="$(id -u)" \
   -e CGID="$(id -g)" \
-  -e UMASK=$(umask) \
+  -e CMASK=$(umask) \
   -e GITHUB_TOKEN="${GITHUB_TOKEN}" \
   -v "$(pwd):/workspace" \
   -v "$HOME/.claude.json:/home/claude/.claude.json" \
