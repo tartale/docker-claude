@@ -6,7 +6,7 @@ clean:
 
 image:
 	docker buildx inspect multi-platform >/dev/null 2>&1 \
-		|| docker buildx create --name multi-platform --driver docker-container --use
+		|| docker buildx create --driver docker-container --use multi-platform
 	docker buildx use multi-platform
 	docker buildx build --platform linux/amd64,linux/arm64 --load -t $(DOCKER_IMAGE) .
 
