@@ -7,6 +7,7 @@ groupmod -g "${CGID}" claude || true
 su -m -s /bin/bash claude << 'EOF'
 set -e
 export HOME=/home/claude
+umask ${UMASK}
 
 if [ -n "$GITHUB_TOKEN" ]; then
     printf '[credential "https://github.com"]\n\thelper = !f() { echo username=x-access-token; echo password=%s; }; f\n' "$GITHUB_TOKEN" > /tmp/gitconfig
