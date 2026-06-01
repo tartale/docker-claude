@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-usermod -u "${UID}" claude >/dev/null 2>&1 || true
-groupmod -g "${GID}" claude >/dev/null 2>&1 || true
+usermod -u "${CUID}" claude >/dev/null 2>&1 || true
+groupmod -g "${CGID}" claude >/dev/null 2>&1 || true
 
 su -m -s /bin/bash claude << 'EOF'
 set -e

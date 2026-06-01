@@ -21,7 +21,7 @@ RUN chown claude:claude /workspace
 
 COPY --chmod=a+x entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ENV UID=1000
-ENV GID=1000
+ENV CUID=1000
+ENV CGID=1000
 
 ENTRYPOINT ["entrypoint.sh"]

@@ -28,8 +28,8 @@ docker run -it --rm \
   --platform "$PLATFORM" \
   --network=host \
   --name "$CONTAINER_NAME" \
-  -e UID="$(id -u)" \
-  -e GID="$(id -g)" \
+  -e CUID="$(id -u)" \
+  -e CGID="$(id -g)" \
   -e GITHUB_TOKEN \
   -v "$(pwd):/workspace" \
   -v "$HOME/.claude.json:/home/claude/.claude.json" \

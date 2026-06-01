@@ -5,7 +5,10 @@ clean:
 	docker rmi $(DOCKER_IMAGE) 2>/dev/null || true
 
 image:
-	docker buildx build --builder multi-platform --platform linux/amd64,linux/arm64 --load -t $(DOCKER_IMAGE) .
+	docker buildx inspect multi-platform >/dev/null 2>&1 \
+		|| docker buildx create --name multi-platform --driver docker-container --use
+	docker buildx use multi-platform
+	docker buildx build --platform linux/amd64,linux/arm64 --load -t $(DOCKER_IMAGE) .
 
 pull:
 	docker pull $(DOCKER_IMAGE)
