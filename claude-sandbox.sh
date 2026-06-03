@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG:-latest}
-DOCKER_IMAGE="tartale/claude-sandbox:${DOCKER_IMAGE_TAG}"
+CS_IMAGE_TAG=${CS_IMAGE_TAG:-latest}
+CS_IMAGE="tartale/claude-sandbox:${CS_IMAGE_TAG}"
 CONTAINER_NAME="claude-sandbox-$(basename "$(pwd)")-$(openssl rand -hex 2)"
 echo "Starting container: $CONTAINER_NAME"
 
@@ -42,4 +42,4 @@ docker run -it --rm \
   -v "$(pwd):/workspace" \
   -v "$HOME/.claude.json:/home/claude/.claude.json" \
   -v "$HOME/.claude:/home/claude/.claude" \
-  "$DOCKER_IMAGE" "$@"
+  "$CS_IMAGE" "$@"
