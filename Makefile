@@ -2,6 +2,9 @@ DOCKER_IMAGE_TAG ?= local
 DOCKER_IMAGE = tartale/claude-sandbox:$(DOCKER_IMAGE_TAG)
 
 PLUGINS_ARG = $(if $(PLUGINS),--build-arg PLUGINS=$(PLUGINS))
+LANGUAGES = $(patsubst plugins/languages/%.sh,%,$(wildcard plugins/languages/*.sh))
+CLAUDE_VERSION ?= $(shell npm view @anthropic-ai/claude-code version 2>/dev/null || echo latest)
+CLAUDE_VERSION_ARG = --build-arg CLAUDE_VERSION=$(CLAUDE_VERSION)
 
 clean:
 	docker rmi $(DOCKER_IMAGE) 2>/dev/null || true
@@ -10,9 +13,9 @@ image:
 	@if docker buildx inspect multi-platform >/dev/null 2>&1 || \
 	    docker buildx create --driver docker-container --use multi-platform >/dev/null 2>&1; then \
 		docker buildx use multi-platform && \
-		docker buildx build --platform linux/amd64,linux/arm64 --push -t $(DOCKER_IMAGE) $(PLUGINS_ARG) .; \
+		docker buildx build --platform linux/amd64,linux/arm64 --push -t $(DOCKER_IMAGE) $(PLUGINS_ARG) $(CLAUDE_VERSION_ARG) .; \
 	else \
-		docker build -t $(DOCKER_IMAGE) $(PLUGINS_ARG) .; \
+		docker build -t $(DOCKER_IMAGE) $(PLUGINS_ARG) $(CLAUDE_VERSION_ARG) .; \
 	fi
 
 pull:
@@ -20,6 +23,14 @@ pull:
 
 push:
 	docker buildx build --platform linux/amd64,linux/arm64 --push \
-	  -t $(DOCKER_IMAGE) -t tartale/claude-sandbox:latest $(PLUGINS_ARG) .
+	  -t $(DOCKER_IMAGE) -t tartale/claude-sandbox:latest $(PLUGINS_ARG) $(CLAUDE_VERSION_ARG) .
 
-.PHONY: clean image pull push
+all: push
+	@for lang in $(LANGUAGES); do \
+		echo "Building tartale/claude-sandbox:$$lang..."; \
+		docker buildx build --platform linux/amd64,linux/arm64 --push \
+		  -t tartale/claude-sandbox:$$lang \
+		  --build-arg PLUGINS=plugins/languages/$$lang.sh $(CLAUDE_VERSION_ARG) .; \
+	done
+
+.PHONY: all clean image pull push

@@ -26,7 +26,8 @@ RUN apt-get update \
       zip \
  && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g @anthropic-ai/claude-code
+ARG CLAUDE_VERSION=latest
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION}
 
 # Rename the default 'node' user/group to 'claude'
 RUN usermod -l claude -d /home/claude -m node \
@@ -36,14 +37,13 @@ WORKDIR /workspace
 RUN chown claude:claude /workspace
 
 COPY plugins/install.sh /usr/local/bin/install-plugins.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ARG PLUGINS=""
 RUN --mount=type=bind,target=/build \
     if [ -n "$PLUGINS" ]; then \
         install-plugins.sh "/build/$PLUGINS"; \
     fi
-
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENV CUID=1000
 ENV CGID=1000
