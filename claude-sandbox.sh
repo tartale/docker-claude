@@ -25,6 +25,11 @@ chmod g+rw "$HOME/.claude.json" 2>/dev/null || true
 chmod g+rw "$HOME/.claude" 2>/dev/null || true
 chmod g+s "$HOME/.claude" 2>/dev/null || true
 
+PLUGINS_ARGS=()
+if [ -n "$PLUGINS" ]; then
+    PLUGINS_ARGS=(-e PLUGINS=/plugins -v "$PLUGINS:/plugins:ro")
+fi
+
 docker run -it --rm \
   --platform "$PLATFORM" \
   --network=host \
@@ -33,6 +38,7 @@ docker run -it --rm \
   -e CGID="$(id -g)" \
   -e CMASK=$(umask) \
   -e GITHUB_TOKEN \
+  "${PLUGINS_ARGS[@]}" \
   -v "$(pwd):/workspace" \
   -v "$HOME/.claude.json:/home/claude/.claude.json" \
   -v "$HOME/.claude:/home/claude/.claude" \

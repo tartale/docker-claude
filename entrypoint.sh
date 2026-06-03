@@ -13,6 +13,10 @@ if [ -n "$existing_user" ] && [ "$existing_user" != "claude" ]; then
 fi
 usermod -u "${CUID}" claude
 
+if [ -n "$PLUGINS" ]; then
+    install-plugins.sh "$PLUGINS"
+fi
+
 su -m -s /bin/bash claude << 'EOF'
 set -e
 export HOME=/home/claude
