@@ -1,5 +1,6 @@
 DOCKER_IMAGE_TAG ?= local
 DOCKER_IMAGE = tartale/claude-sandbox:$(DOCKER_IMAGE_TAG)
+REGISTRY     = tartale/claude-sandbox
 
 PLUGINS_ARG = $(if $(PLUGINS),--build-arg PLUGINS=$(PLUGINS))
 LANGUAGES = $(patsubst plugins/languages/%.sh,%,$(wildcard plugins/languages/*.sh))
@@ -33,4 +34,12 @@ all: push
 		  --build-arg PLUGINS=plugins/languages/$$lang.sh $(CLAUDE_VERSION_ARG) .; \
 	done
 
-.PHONY: all clean image pull push
+tags: tags-base tags-languages
+
+tags-base:
+	./tag-images.sh base
+
+tags-languages:
+	./tag-images.sh languages
+
+.PHONY: all clean image pull push tags tags-base tags-languages
