@@ -116,6 +116,33 @@ apt-get update && apt-get install -y my-tool && rm -rf /var/lib/apt/lists/*
 
 The script runs as root during `docker build`, so standard `apt-get` installs work without `sudo`. Make sure the file is executable (`chmod +x`) before building.
 
+### Composing built-in plugins
+
+`PLUGINS_DIR` is pre-populated with the path to the root of the `plugins/` directory. A custom plugin placed inside `plugins/languages/` can use it to source other language plugins by path.
+
+**Example — a Go + React stack:**
+
+```bash
+# plugins/languages/go-react.sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+bash "$PLUGINS_DIR/languages/go.sh"
+bash "$PLUGINS_DIR/languages/react.sh"
+```
+
+```bash
+chmod +x plugins/languages/go-react.sh
+PLUGINS=plugins/languages/go-react.sh CS_IMAGE_TAG=go-react make image
+```
+
+Each sourced plugin respects `LANGUAGE_VERSIONS`, so you can still pin versions:
+
+```bash
+PLUGINS=plugins/languages/go-react.sh CS_IMAGE_TAG=go-react \
+  LANGUAGE_VERSIONS="go-1.25.10" make image
+```
+
 ### Runtime plugins
 
 `PLUGINS` also works at runtime with `claude-sandbox.sh`. The script (or directory) is bind-mounted into the container and executed before Claude starts, letting you run setup steps without rebuilding the image:
