@@ -20,6 +20,7 @@ RUN apt-get update \
       procps \
       python3 \
       ripgrep \
+      shellcheck \
       tree \
       unzip \
       vim \

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-CS_IMAGE_TAG=${CS_IMAGE_TAG:-latest}
+CS_IMAGE_TAG=${CS_IMAGE_TAG:-local}
 CS_IMAGE="tartale/claude-sandbox:${CS_IMAGE_TAG}"
 CONTAINER_NAME="claude-sandbox-$(basename "$(pwd)")-$(openssl rand -hex 2)"
 echo "Starting container: $CONTAINER_NAME"
@@ -49,7 +49,7 @@ docker run -it --rm \
   "${ENV_ARGS[@]}" \
   -e CUID="$(id -u)" \
   -e CGID="$(id -g)" \
-  -e CMASK=$(umask) \
+  -e CMASK="$(umask)" \
   "${PLUGINS_ARGS[@]}" \
   -v "$(pwd):/workspace" \
   -v "$HOME/.claude.json:/home/claude/.claude.json" \
