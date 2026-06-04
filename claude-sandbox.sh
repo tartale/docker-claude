@@ -15,6 +15,7 @@ esac
 # Ensure credential files exist before bind-mounting (Docker creates a
 # directory instead of a file if the source path is absent).
 touch "$HOME/.claude.json"
+touch "$HOME/.gitconfig"
 mkdir -p "$HOME/.claude"
 
 # Allow the container's claude user (UID 1000) to write to host-owned files by
@@ -54,4 +55,5 @@ docker run -it --rm \
   -v "$(pwd):/workspace" \
   -v "$HOME/.claude.json:/home/claude/.claude.json" \
   -v "$HOME/.claude:/home/claude/.claude" \
+  -v "$HOME/.gitconfig:/home/claude/.gitconfig:ro" \
   "$CS_IMAGE" "$@"
