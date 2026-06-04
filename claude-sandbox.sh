@@ -43,7 +43,10 @@ if [ -f "$CS_ENV_FILE" ]; then
     done < <(grep -Ev '^\s*(#|$)' "$CS_ENV_FILE" | sed 's/^export //')
 fi
 
-docker run -it --rm \
+DOCKER_FLAGS=(-i --rm)
+[ -t 0 ] && DOCKER_FLAGS+=(-t)
+
+docker run "${DOCKER_FLAGS[@]}" \
   --platform "$PLATFORM" \
   --network=host \
   --name "$CONTAINER_NAME" \
