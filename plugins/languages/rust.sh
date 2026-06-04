@@ -4,8 +4,10 @@ set -euo pipefail
 export RUSTUP_HOME=/usr/local/rustup
 export CARGO_HOME=/usr/local/cargo
 
+RUST_VERSION=$(echo "${LANG_VERSION:-}" | tr ' ' '\n' | grep '^rust-' | head -1 | sed 's/rust-//')
+
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-  | sh -s -- -y --no-modify-path --default-toolchain stable
+  | sh -s -- -y --no-modify-path --default-toolchain "${RUST_VERSION:-stable}"
 
 # Symlink into /usr/local/bin so tools are available without PATH changes
 ln -sf /usr/local/cargo/bin/cargo   /usr/local/bin/cargo

@@ -2,7 +2,9 @@
 set -euo pipefail
 
 ARCH=$(dpkg --print-architecture)
-GO_VERSION=$(curl -fsSL "https://go.dev/dl/?mode=json" | jq -r '.[0].version')
+GO_VERSION=$(echo "${LANG_VERSION:-}" | tr ' ' '\n' | grep '^go-' | head -1)
+GO_VERSION=${GO_VERSION:-$(curl -fsSL "https://go.dev/dl/?mode=json" | jq -r '.[0].version')}
+GO_VERSION=${GO_VERSION/go-/go}
 
 curl -fsSL "https://go.dev/dl/${GO_VERSION}.linux-${ARCH}.tar.gz" \
   | tar -C /usr/local -xz

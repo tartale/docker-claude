@@ -21,6 +21,12 @@ Run this from any project directory. Claude Code will start inside a container w
 
 Any arguments are passed through to `claude`.
 
+To use a specific image tag (e.g. a language-pinned image you built):
+
+```bash
+CS_IMAGE_TAG=go-1.25.10 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/claude-sandbox.sh)"
+```
+
 ## Plugins
 
 Plugins are shell scripts that install additional tools into the sandbox. The `plugins/` directory contains ready-made language packs:
@@ -28,26 +34,60 @@ Plugins are shell scripts that install additional tools into the sandbox. The `p
 | Plugin | Installs |
 |---|---|
 | `plugins/languages/cpp.sh` | `build-essential`, `clang`, `cmake`, `gdb`, `ninja`, `valgrind` |
-| `plugins/languages/go.sh` | Latest stable Go toolchain |
-| `plugins/languages/java.sh` | OpenJDK 21, Maven |
+| `plugins/languages/go.sh` | Go toolchain |
+| `plugins/languages/java.sh` | OpenJDK, Maven |
 | `plugins/languages/python.sh` | `pip`, `venv`, `pipx`, `uv` |
 | `plugins/languages/ruby.sh` | Ruby, Bundler |
-| `plugins/languages/rust.sh` | Rust stable via rustup (`cargo`, `rustc`, `rustfmt`, `clippy`) |
+| `plugins/languages/rust.sh` | Rust via rustup (`cargo`, `rustc`, `rustfmt`, `clippy`) |
+| `plugins/languages/typescript.sh` | TypeScript, `ts-node`, `tsx`, `@types/node` |
+
+All plugins default to the latest stable version. See [Pinning a language version](#pinning-a-language-version) to install a specific version.
 
 ### Using a single plugin
 
 Pass the path to a script as `PLUGINS` when building the image:
 
 ```bash
-PLUGINS=plugins/languages/go.sh DOCKER_IMAGE_TAG=my-tag make image
+PLUGINS=plugins/languages/go.sh CS_IMAGE_TAG=my-tag make image
 ```
+
+### Pinning a language version
+
+Pass `LANG_VERSION` as a space-separated list of `<language>-<version>` entries. Each plugin extracts only its own entry, so this works for both single plugins and directories:
+
+```bash
+# single plugin
+PLUGINS=plugins/languages/go.sh CS_IMAGE_TAG=go-1.25.10 LANG_VERSION="go-1.25.10" make image
+
+# plugin directory — each plugin picks its own version
+PLUGINS=plugins/languages CS_IMAGE_TAG=my-tag LANG_VERSION="go-1.25.10" make image
+```
+
+When a plugin's entry is absent from `LANG_VERSION`, it installs the latest stable version.
+
+Plugins that support version pinning via `LANG_VERSION`:
+
+| Plugin | Format | Example |
+|---|---|---|
+| `plugins/languages/cpp.sh` | `cpp-<clang-major>` | `cpp-17` |
+| `plugins/languages/go.sh` | `go-<version>` | `go-1.25.10` |
+| `plugins/languages/java.sh` | `java-<major>` | `java-21` |
+| `plugins/languages/python.sh` | `python-<version>` | `python-3.13.2` |
+| `plugins/languages/ruby.sh` | `ruby-<version>` | `ruby-3.3.0` |
+| `plugins/languages/rust.sh` | `rust-<version>` | `rust-1.78.0` |
+| `plugins/languages/typescript.sh` | `typescript-<version>` | `typescript-5.4.0` |
+
+Notes:
+- **cpp**: version refers to the clang major version installed from the [LLVM apt repo](https://apt.llvm.org)
+- **java**: only major versions available in Debian apt are supported (e.g. `11`, `17`, `21`)
+- **ruby**: compiles from source via `ruby-build` — expect longer build times
 
 ### Using multiple plugins
 
 Pass a directory of `.sh` scripts to run all of them, in alphabetical order:
 
 ```bash
-PLUGINS=plugins/languages DOCKER_IMAGE_TAG=my-tag make image
+PLUGINS=plugins/languages CS_IMAGE_TAG=my-tag make image
 ```
 
 Prefix filenames with numbers to control order when it matters (`01-go.sh`, `02-rust.sh`, …).
@@ -76,7 +116,8 @@ PLUGINS=plugins/languages/python.sh ./claude-sandbox.sh
 
 | Variable | Description |
 |---|---|
-| `DOCKER_IMAGE_TAG` | Tag of the `tartale/claude-sandbox` image to use (default: `latest`) |
+| `CS_IMAGE_TAG` | Tag of the `tartale/claude-sandbox` image to use (default: `latest`) |
+| `LANG_VERSION` | Space-separated list of language versions in `<language>-<version>` format (e.g. `"go-1.25.10"`). Each plugin extracts its own entry; omitted plugins default to latest stable. |
 | `GITHUB_TOKEN` | If set, configures Git inside the container to authenticate to GitHub using this token |
 | `PLUGINS` | Path to a plugin script or directory of plugin scripts to install |
 
