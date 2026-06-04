@@ -30,14 +30,19 @@ if [ -n "$PLUGINS" ]; then
     PLUGINS_ARGS=(-e PLUGINS=/plugins -v "$PLUGINS:/plugins:ro")
 fi
 
+ENV_ARGS=()
+while IFS= read -r key; do
+    ENV_ARGS+=(-e "$key")
+done < <(compgen -e)
+
 docker run -it --rm \
   --platform "$PLATFORM" \
   --network=host \
   --name "$CONTAINER_NAME" \
+  "${ENV_ARGS[@]}" \
   -e CUID="$(id -u)" \
   -e CGID="$(id -g)" \
   -e CMASK=$(umask) \
-  -e GITHUB_TOKEN \
   "${PLUGINS_ARGS[@]}" \
   -v "$(pwd):/workspace" \
   -v "$HOME/.claude.json:/home/claude/.claude.json" \
