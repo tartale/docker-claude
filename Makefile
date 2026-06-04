@@ -2,7 +2,7 @@ CS_IMAGE_TAG ?= local
 CS_IMAGE = tartale/claude-sandbox:$(CS_IMAGE_TAG)
 REGISTRY = tartale/claude-sandbox
 
-PLUGINS_STAGED = $(if $(PLUGINS),.plugins-build/plugin.sh)
+PLUGINS_STAGED = $(if $(PLUGINS),plugins/custom/plugin.sh)
 PLUGINS_ARG = $(if $(PLUGINS),--build-arg PLUGINS=$(PLUGINS_STAGED))
 LANGUAGE_VERSIONS_ARG = $(if $(LANGUAGE_VERSIONS),--build-arg LANGUAGE_VERSIONS=$(LANGUAGE_VERSIONS))
 LANGUAGES = $(patsubst plugins/languages/%.sh,%,$(wildcard plugins/languages/*.sh))
@@ -11,10 +11,10 @@ CLAUDE_VERSION_ARG = --build-arg CLAUDE_VERSION=$(CLAUDE_VERSION)
 
 clean:
 	docker rmi $(CS_IMAGE) 2>/dev/null || true
-	rm -rf .plugins-build
+	rm -f plugins/custom/plugin.sh
 
 stage-plugin:
-	$(if $(PLUGINS),mkdir -p .plugins-build && cp "$(PLUGINS)" "$(PLUGINS_STAGED)")
+	$(if $(PLUGINS),mkdir -p plugins/custom && cp "$(PLUGINS)" "$(PLUGINS_STAGED)")
 
 image: stage-plugin
 	@if docker buildx inspect multi-platform >/dev/null 2>&1 || \
