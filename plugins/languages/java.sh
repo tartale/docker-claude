@@ -6,6 +6,6 @@ JAVA_MAJOR="${JAVA_VERSION%%.*}"
 
 apt-get update
 apt-get install -y \
-  "openjdk-${JAVA_MAJOR:-21}-jdk" \
+  "openjdk-${JAVA_MAJOR:-17}-jdk" \
   maven
 rm -rf /var/lib/apt/lists/*
