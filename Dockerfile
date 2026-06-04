@@ -26,7 +26,8 @@ RUN apt-get update \
       vim \
       wget \
       zip \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && git lfs install --system
 
 ARG CLAUDE_VERSION=latest
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION}
