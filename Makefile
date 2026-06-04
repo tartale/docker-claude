@@ -15,7 +15,7 @@ image:
 	@if docker buildx inspect multi-platform >/dev/null 2>&1 || \
 	    docker buildx create --driver docker-container --use multi-platform >/dev/null 2>&1; then \
 		docker buildx use multi-platform && \
-		docker buildx build --platform linux/amd64,linux/arm64 --push -t $(CS_IMAGE) $(PLUGINS_ARG) $(LANGUAGE_VERSIONS_ARG) $(CLAUDE_VERSION_ARG) .; \
+		docker buildx build --load -t $(CS_IMAGE) $(PLUGINS_ARG) $(LANGUAGE_VERSIONS_ARG) $(CLAUDE_VERSION_ARG) .; \
 	else \
 		docker build -t $(CS_IMAGE) $(PLUGINS_ARG) $(LANGUAGE_VERSIONS_ARG) $(CLAUDE_VERSION_ARG) .; \
 	fi
