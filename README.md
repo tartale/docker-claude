@@ -41,18 +41,18 @@ CS_IMAGE_TAG=go-1.25.10 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent
 
 Plugins are shell scripts that install additional tools into the sandbox. The `plugins/` directory contains ready-made language packs:
 
-| Plugin | Installs |
-|---|---|
-| `plugins/languages/cpp.sh` | `build-essential`, `clang`, `cmake`, `gdb`, `ninja`, `valgrind` |
-| `plugins/languages/go.sh` | Go toolchain |
-| `plugins/languages/java.sh` | OpenJDK, Maven |
-| `plugins/languages/python2.sh` | `pip`, `venv`, `pipx`, `uv` |
-| `plugins/languages/python3.sh` | `pip`, `venv`, `pipx`, `uv` (uses `python3-` version prefix) |
-| `plugins/languages/ruby.sh` | Ruby, Bundler |
-| `plugins/languages/rust.sh` | Rust via rustup (`cargo`, `rustc`, `rustfmt`, `clippy`) |
-| `plugins/languages/typescript.sh` | TypeScript, `ts-node`, `tsx`, `@types/node` |
+| Plugin | Installs | Version format | Example |
+|---|---|---|---|
+| `plugins/languages/cpp.sh` | `build-essential`, `clang`, `cmake`, `gdb`, `ninja`, `valgrind` | `cpp-<clang-major>` | `cpp-17` |
+| `plugins/languages/go.sh` | Go toolchain | `go-<version>` | `go-1.25.10` |
+| `plugins/languages/java.sh` | OpenJDK, Maven | `java-<major>` | `java-21` |
+| `plugins/languages/python2.sh` | `pip`, `venv`, `pipx`, `uv` | `python-<version>` | `python-3.13.2` |
+| `plugins/languages/python3.sh` | `pip`, `venv`, `pipx`, `uv` (uses `python3-` version prefix) | `python3-<version>` | `python3-3.13.2` |
+| `plugins/languages/ruby.sh` | Ruby, Bundler | `ruby-<version>` | `ruby-3.3.0` |
+| `plugins/languages/rust.sh` | Rust via rustup (`cargo`, `rustc`, `rustfmt`, `clippy`) | `rust-<version>` | `rust-1.78.0` |
+| `plugins/languages/typescript.sh` | TypeScript, `ts-node`, `tsx`, `@types/node` | `typescript-<version>` | `typescript-5.4.0` |
 
-All plugins default to the latest stable version. See [Pinning a language version](#pinning-a-language-version) to install a specific version.
+All plugins default to the latest stable version. See [Pinning a language version](#pinning-a-language-version) for details.
 
 ### Using a single plugin
 
@@ -75,19 +75,6 @@ PLUGINS=plugins/languages CS_IMAGE_TAG=my-tag LANGUAGE_VERSIONS="go-1.25.10" mak
 ```
 
 When a plugin's entry is absent from `LANGUAGE_VERSIONS`, it installs the latest stable version.
-
-Plugins that support version pinning via `LANGUAGE_VERSIONS`:
-
-| Plugin | Format | Example |
-|---|---|---|
-| `plugins/languages/cpp.sh` | `cpp-<clang-major>` | `cpp-17` |
-| `plugins/languages/go.sh` | `go-<version>` | `go-1.25.10` |
-| `plugins/languages/java.sh` | `java-<major>` | `java-21` |
-| `plugins/languages/python2.sh` | `python-<version>` | `python-3.13.2` |
-| `plugins/languages/python3.sh` | `python3-<version>` | `python3-3.13.2` |
-| `plugins/languages/ruby.sh` | `ruby-<version>` | `ruby-3.3.0` |
-| `plugins/languages/rust.sh` | `rust-<version>` | `rust-1.78.0` |
-| `plugins/languages/typescript.sh` | `typescript-<version>` | `typescript-5.4.0` |
 
 Notes:
 - **cpp**: version refers to the clang major version installed from the [LLVM apt repo](https://apt.llvm.org)
@@ -114,7 +101,7 @@ set -euo pipefail
 apt-get update && apt-get install -y my-tool && rm -rf /var/lib/apt/lists/*
 ```
 
-The script runs as root during `docker build`, so standard `apt-get` installs work without `sudo`. Make sure the file is executable (`chmod +x`) before building.
+The script runs as root during `docker build`, so standard `apt-get` installs work without `sudo`.
 
 ### Composing built-in plugins
 
@@ -132,7 +119,6 @@ bash "$PLUGINS_DIR/languages/react.sh"
 ```
 
 ```bash
-chmod +x plugins/languages/go-react.sh
 PLUGINS=plugins/languages/go-react.sh CS_IMAGE_TAG=go-react make image
 ```
 
