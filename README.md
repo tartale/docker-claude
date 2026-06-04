@@ -117,6 +117,7 @@ PLUGINS=plugins/languages/python.sh ./claude-sandbox.sh
 | Variable | Description |
 |---|---|
 | `CS_IMAGE_TAG` | Tag of the `tartale/claude-sandbox` image to use (default: `latest`) |
+| `CS_ENV_FILE` | Path to an env file to pass into the container (default: `.env`) |
 | `LANG_VERSION` | Space-separated list of language versions in `<language>-<version>` format (e.g. `"go-1.25.10"`). Each plugin extracts its own entry; omitted plugins default to latest stable. |
 | `PLUGINS` | Path to a plugin script or directory of plugin scripts to install |
 
@@ -130,7 +131,13 @@ GITHUB_TOKEN=ghp_...
 MY_API_KEY=...
 ```
 
-The `.env` file follows standard `KEY=VALUE` format. Variables not listed in `.env` are not passed to the container.
+The `.env` file follows standard `KEY=VALUE` format. Variables not listed in the file are not passed to the container.
+
+To use a different file name, set `CS_ENV_FILE`:
+
+```bash
+CS_ENV_FILE=.env.sandbox /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/claude-sandbox.sh)"
+```
 
 ## License
 

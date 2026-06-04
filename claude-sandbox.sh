@@ -30,9 +30,10 @@ if [ -n "$PLUGINS" ]; then
     PLUGINS_ARGS=(-e PLUGINS=/plugins -v "$PLUGINS:/plugins:ro")
 fi
 
+CS_ENV_FILE="${CS_ENV_FILE:-.env}"
 ENV_ARGS=()
-if [ -f ".env" ]; then
-    ENV_ARGS=(--env-file ".env")
+if [ -f "$CS_ENV_FILE" ]; then
+    ENV_ARGS=(--env-file "$CS_ENV_FILE")
 fi
 
 docker run -it --rm \
