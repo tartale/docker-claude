@@ -46,7 +46,8 @@ Plugins are shell scripts that install additional tools into the sandbox. The `p
 | `plugins/languages/cpp.sh` | `build-essential`, `clang`, `cmake`, `gdb`, `ninja`, `valgrind` |
 | `plugins/languages/go.sh` | Go toolchain |
 | `plugins/languages/java.sh` | OpenJDK, Maven |
-| `plugins/languages/python.sh` | `pip`, `venv`, `pipx`, `uv` |
+| `plugins/languages/python2.sh` | `pip`, `venv`, `pipx`, `uv` |
+| `plugins/languages/python3.sh` | `pip`, `venv`, `pipx`, `uv` (uses `python3-` version prefix) |
 | `plugins/languages/ruby.sh` | Ruby, Bundler |
 | `plugins/languages/rust.sh` | Rust via rustup (`cargo`, `rustc`, `rustfmt`, `clippy`) |
 | `plugins/languages/typescript.sh` | TypeScript, `ts-node`, `tsx`, `@types/node` |
@@ -82,7 +83,8 @@ Plugins that support version pinning via `LANGUAGE_VERSIONS`:
 | `plugins/languages/cpp.sh` | `cpp-<clang-major>` | `cpp-17` |
 | `plugins/languages/go.sh` | `go-<version>` | `go-1.25.10` |
 | `plugins/languages/java.sh` | `java-<major>` | `java-21` |
-| `plugins/languages/python.sh` | `python-<version>` | `python-3.13.2` |
+| `plugins/languages/python2.sh` | `python-<version>` | `python-3.13.2` |
+| `plugins/languages/python3.sh` | `python3-<version>` | `python3-3.13.2` |
 | `plugins/languages/ruby.sh` | `ruby-<version>` | `ruby-3.3.0` |
 | `plugins/languages/rust.sh` | `rust-<version>` | `rust-1.78.0` |
 | `plugins/languages/typescript.sh` | `typescript-<version>` | `typescript-5.4.0` |
@@ -119,7 +121,7 @@ The script runs as root during `docker build`, so standard `apt-get` installs wo
 `PLUGINS` also works at runtime with `claude-sandbox.sh`. The script (or directory) is bind-mounted into the container and executed before Claude starts, letting you run setup steps without rebuilding the image:
 
 ```bash
-PLUGINS=plugins/languages/python.sh ./claude-sandbox.sh
+PLUGINS=plugins/languages/python2.sh ./claude-sandbox.sh
 ```
 
 ## Environment variables
