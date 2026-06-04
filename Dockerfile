@@ -40,7 +40,7 @@ RUN chown claude:claude /workspace
 COPY plugins/install.sh /usr/local/bin/install-plugins.sh
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ARG LANG_VERSION=""
+ARG LANGUAGE_VERSIONS=""
 ARG PLUGINS=""
 RUN --mount=type=bind,target=/build \
     if [ -n "$PLUGINS" ]; then \

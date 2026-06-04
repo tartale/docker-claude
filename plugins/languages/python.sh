@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PYTHON_VERSION=$(echo "${LANG_VERSION:-}" | tr ' ' '\n' | grep '^python-' | head -1 | sed 's/python-//')
+PYTHON_VERSION=$(echo "${LANGUAGE_VERSIONS:-}" | tr ' ' '\n' | grep '^python-' | head -1 | sed 's/python-//')
 
 apt-get update
 apt-get install -y \

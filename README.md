@@ -53,19 +53,19 @@ PLUGINS=plugins/languages/go.sh CS_IMAGE_TAG=my-tag make image
 
 ### Pinning a language version
 
-Pass `LANG_VERSION` as a space-separated list of `<language>-<version>` entries. Each plugin extracts only its own entry, so this works for both single plugins and directories:
+Pass `LANGUAGE_VERSIONS` as a space-separated list of `<language>-<version>` entries. Each plugin extracts only its own entry, so this works for both single plugins and directories:
 
 ```bash
 # single plugin
-PLUGINS=plugins/languages/go.sh CS_IMAGE_TAG=go-1.25.10 LANG_VERSION="go-1.25.10" make image
+PLUGINS=plugins/languages/go.sh CS_IMAGE_TAG=go-1.25.10 LANGUAGE_VERSIONS="go-1.25.10" make image
 
 # plugin directory — each plugin picks its own version
-PLUGINS=plugins/languages CS_IMAGE_TAG=my-tag LANG_VERSION="go-1.25.10" make image
+PLUGINS=plugins/languages CS_IMAGE_TAG=my-tag LANGUAGE_VERSIONS="go-1.25.10" make image
 ```
 
-When a plugin's entry is absent from `LANG_VERSION`, it installs the latest stable version.
+When a plugin's entry is absent from `LANGUAGE_VERSIONS`, it installs the latest stable version.
 
-Plugins that support version pinning via `LANG_VERSION`:
+Plugins that support version pinning via `LANGUAGE_VERSIONS`:
 
 | Plugin | Format | Example |
 |---|---|---|
@@ -118,7 +118,7 @@ PLUGINS=plugins/languages/python.sh ./claude-sandbox.sh
 |---|---|
 | `CS_IMAGE_TAG` | Tag of the `tartale/claude-sandbox` image to use (default: `latest`) |
 | `CS_ENV_FILE` | Path to an env file to pass into the container (default: `.env`) |
-| `LANG_VERSION` | Space-separated list of language versions in `<language>-<version>` format (e.g. `"go-1.25.10"`). Each plugin extracts its own entry; omitted plugins default to latest stable. |
+| `LANGUAGE_VERSIONS` | Space-separated list of language versions in `<language>-<version>` format (e.g. `"go-1.25.10"`). Each plugin extracts its own entry; omitted plugins default to latest stable. |
 | `PLUGINS` | Path to a plugin script or directory of plugin scripts to install |
 
 ### Passing environment variables into the container
