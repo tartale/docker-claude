@@ -2,7 +2,7 @@ CS_IMAGE_TAG ?= local
 CS_IMAGE = tartale/claude-sandbox:$(CS_IMAGE_TAG)
 REGISTRY = tartale/claude-sandbox
 
-PLUGINS_STAGED = $(if $(PLUGINS),.plugins-build/$(notdir $(PLUGINS)))
+PLUGINS_STAGED = $(if $(PLUGINS),.plugins-build/plugin.sh)
 PLUGINS_ARG = $(if $(PLUGINS),--build-arg PLUGINS=$(PLUGINS_STAGED))
 LANGUAGE_VERSIONS_ARG = $(if $(LANGUAGE_VERSIONS),--build-arg LANGUAGE_VERSIONS=$(LANGUAGE_VERSIONS))
 LANGUAGES = $(patsubst plugins/languages/%.sh,%,$(wildcard plugins/languages/*.sh))
