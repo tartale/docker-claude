@@ -2,7 +2,7 @@ CS_IMAGE_TAG ?= local
 CS_IMAGE = tartale/claude-sandbox:$(CS_IMAGE_TAG)
 REGISTRY = tartale/claude-sandbox
 
-PLUGINS_ARG = $(if $(PLUGINS),--build-arg PLUGINS=$(PLUGINS))
+PLUGINS_ARG = $(if $(PLUGINS),--build-arg "PLUGINS=$(PLUGINS)")
 LANGUAGE_VERSIONS_ARG = $(if $(LANGUAGE_VERSIONS),--build-arg LANGUAGE_VERSIONS=$(LANGUAGE_VERSIONS))
 LANGUAGES = $(patsubst plugins/languages/%.sh,%,$(wildcard plugins/languages/*.sh))
 CLAUDE_VERSION ?= $(shell npm view @anthropic-ai/claude-code version 2>/dev/null || echo latest)
