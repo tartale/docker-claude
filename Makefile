@@ -2,7 +2,7 @@ CS_IMAGE_TAG ?= local
 CS_IMAGE = tartale/claude-sandbox:$(CS_IMAGE_TAG)
 REGISTRY = tartale/claude-sandbox
 
-PLUGINS_STAGED = $(if $(PLUGINS),plugins/.build/plugin.sh)
+PLUGINS_STAGED = $(if $(PLUGINS),plugins/.build)
 PLUGINS_ARG = $(if $(PLUGINS),--build-arg PLUGINS=$(PLUGINS_STAGED))
 LANGUAGE_VERSIONS_ARG = $(if $(LANGUAGE_VERSIONS),--build-arg LANGUAGE_VERSIONS=$(LANGUAGE_VERSIONS))
 LANGUAGES = $(patsubst plugins/languages/%.sh,%,$(wildcard plugins/languages/*.sh))
@@ -13,10 +13,17 @@ clean:
 	docker rmi $(CS_IMAGE) 2>/dev/null || true
 	rm -rf plugins/.build
 
-stage-plugin:
-	$(if $(PLUGINS),mkdir -p plugins/.build && cp "$(PLUGINS)" "$(PLUGINS_STAGED)")
+stage-plugins:
+	@if [ -n "$(PLUGINS)" ]; then \
+		mkdir -p plugins/.build; \
+		if [ -d "$(PLUGINS)" ]; then \
+			find "$(PLUGINS)" -maxdepth 1 -name '*.sh' -exec cp {} plugins/.build/ \;; \
+		else \
+			cp "$(PLUGINS)" plugins/.build/plugin.sh; \
+		fi; \
+	fi
 
-image: stage-plugin
+image: stage-plugins
 	@if docker buildx inspect multi-platform >/dev/null 2>&1 || \
 	    docker buildx create --driver docker-container --use multi-platform >/dev/null 2>&1; then \
 		docker buildx use multi-platform && \
@@ -28,7 +35,7 @@ image: stage-plugin
 pull:
 	docker pull $(CS_IMAGE)
 
-push: stage-plugin
+push: stage-plugins
 	docker buildx build --platform linux/amd64,linux/arm64 --push \
 	  -t $(CS_IMAGE) -t tartale/claude-sandbox:latest $(PLUGINS_ARG) $(LANGUAGE_VERSIONS_ARG) $(CLAUDE_VERSION_ARG) .
 
@@ -48,4 +55,4 @@ tags-base:
 tags-languages:
 	./tag-images.sh languages
 
-.PHONY: all clean image pull push stage-plugin tags tags-base tags-languages
+.PHONY: all clean image pull push stage-plugins tags tags-base tags-languages
