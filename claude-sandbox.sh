@@ -43,20 +43,33 @@ if [ -f "$CS_ENV_FILE" ]; then
     done < <(grep -Ev '^\s*(#|$)' "$CS_ENV_FILE" | sed 's/^export //')
 fi
 
-DOCKER_FLAGS=(-i --rm)
-[ -t 0 ] && DOCKER_FLAGS+=(-t)
+DOCKER_FLAGS=(--rm)
+if [ -t 0 ] || [ -c /dev/tty ]; then
+    DOCKER_FLAGS+=(-it)
+else
+    DOCKER_FLAGS+=(-i)
+fi
 
-docker run "${DOCKER_FLAGS[@]}" \
-  --platform "$PLATFORM" \
-  --network=host \
-  --name "$CONTAINER_NAME" \
-  "${ENV_ARGS[@]}" \
-  -e CUID="$(id -u)" \
-  -e CGID="$(id -g)" \
-  -e CMASK="$(umask)" \
-  "${PLUGINS_ARGS[@]}" \
-  -v "$(pwd):/workspace" \
-  -v "$HOME/.claude.json:/home/claude/.claude.json" \
-  -v "$HOME/.claude:/home/claude/.claude" \
-  -v "$HOME/.gitconfig:/home/claude/.gitconfig:ro" \
-  "$CS_IMAGE" "$@"
+DOCKER_ARGS=(
+    "${DOCKER_FLAGS[@]}"
+    --platform "$PLATFORM"
+    --network=host
+    --name "$CONTAINER_NAME"
+    "${ENV_ARGS[@]}"
+    -e CUID="$(id -u)"
+    -e CGID="$(id -g)"
+    -e CMASK="$(umask)"
+    "${PLUGINS_ARGS[@]}"
+    -v "$(pwd):/workspace"
+    -v "$HOME/.claude.json:/home/claude/.claude.json"
+    -v "$HOME/.claude:/home/claude/.claude"
+    -v "$HOME/.gitconfig:/home/claude/.gitconfig:ro"
+    "$CS_IMAGE" "$@"
+)
+
+# When piped (e.g. curl | bash), stdin is not a TTY but /dev/tty still
+# gives us access to the terminal — route docker's stdin through it.
+if ! [ -t 0 ] && [ -c /dev/tty ]; then
+    exec docker run "${DOCKER_ARGS[@]}" </dev/tty
+fi
+exec docker run "${DOCKER_ARGS[@]}"
