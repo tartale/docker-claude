@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CPP_VERSION=$(echo "${LANGUAGE_VERSIONS:-}" | tr ' ' '\n' | grep '^cpp-' | head -1 | sed 's/cpp-//')
+CPP_VERSION=$(echo "${LANGUAGE_VERSIONS:-}" | tr ' ' '\n' | grep '^cpp-' | head -1 | sed 's/cpp-//') || true
 CLANG_MAJOR="${CPP_VERSION%%.*}"
 
 apt-get update
