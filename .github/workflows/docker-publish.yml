@@ -32,7 +32,9 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: tartale/claude-sandbox:latest
+          tags: |
+            tartale/claude-sandbox:latest
+            tartale/claude-sandbox:${{ steps.claude-version.outputs.version }}
           build-args: CLAUDE_VERSION=${{ steps.claude-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -44,6 +46,7 @@ jobs:
             echo "Building $lang..."
             docker buildx build --platform linux/amd64,linux/arm64 --push \
               -t tartale/claude-sandbox:$lang \
+              -t "tartale/claude-sandbox:$lang-${{ steps.claude-version.outputs.version }}" \
               --build-arg PLUGINS=plugins/languages/$lang.sh \
               --build-arg CLAUDE_VERSION=${{ steps.claude-version.outputs.version }} \
               .
