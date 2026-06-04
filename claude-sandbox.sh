@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+GITHUB_TOKEN="${CS_GITHUB_TOKEN:-${GITHUB_TOKEN:-}}"
+
 CS_IMAGE_TAG=${CS_IMAGE_TAG:-local}
 CS_IMAGE="tartale/claude-sandbox:${CS_IMAGE_TAG}"
 CONTAINER_NAME="claude-sandbox-$(basename "$(pwd)")-$(openssl rand -hex 2)"
