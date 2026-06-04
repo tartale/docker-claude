@@ -14,14 +14,7 @@ clean:
 	rm -rf plugins/.build
 
 stage-plugins:
-	@if [ -n "$(PLUGINS)" ]; then \
-		mkdir -p plugins/.build; \
-		if [ -d "$(PLUGINS)" ]; then \
-			find "$(PLUGINS)" -maxdepth 1 -name '*.sh' -exec cp {} plugins/.build/ \;; \
-		else \
-			cp "$(PLUGINS)" plugins/.build/plugin.sh; \
-		fi; \
-	fi
+	plugins/stage.sh "$(PLUGINS)"
 
 image: stage-plugins
 	@if docker buildx inspect multi-platform >/dev/null 2>&1 || \
