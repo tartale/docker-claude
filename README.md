@@ -118,8 +118,19 @@ PLUGINS=plugins/languages/python.sh ./claude-sandbox.sh
 |---|---|
 | `CS_IMAGE_TAG` | Tag of the `tartale/claude-sandbox` image to use (default: `latest`) |
 | `LANG_VERSION` | Space-separated list of language versions in `<language>-<version>` format (e.g. `"go-1.25.10"`). Each plugin extracts its own entry; omitted plugins default to latest stable. |
-| `GITHUB_TOKEN` | If set, configures Git inside the container to authenticate to GitHub using this token |
 | `PLUGINS` | Path to a plugin script or directory of plugin scripts to install |
+
+### Passing environment variables into the container
+
+If a `.env` file exists in the current directory, it is passed to the container via `--env-file`. Use this to inject secrets or project-specific configuration:
+
+```bash
+# .env
+GITHUB_TOKEN=ghp_...
+MY_API_KEY=...
+```
+
+The `.env` file follows standard `KEY=VALUE` format. Variables not listed in `.env` are not passed to the container.
 
 ## License
 

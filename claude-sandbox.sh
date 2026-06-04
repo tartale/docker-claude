@@ -31,9 +31,9 @@ if [ -n "$PLUGINS" ]; then
 fi
 
 ENV_ARGS=()
-while IFS= read -r key; do
-    ENV_ARGS+=(-e "$key")
-done < <(compgen -e)
+if [ -f ".env" ]; then
+    ENV_ARGS=(--env-file ".env")
+fi
 
 docker run -it --rm \
   --platform "$PLATFORM" \
