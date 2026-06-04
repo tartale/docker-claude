@@ -19,9 +19,19 @@ The container runs as a user matching your host UID and GID, so files written to
 
 Run this from any project directory. Claude Code will start inside a container with that directory as `/workspace`.
 
-Any arguments are passed through to `claude`.
+### Passing arguments to Claude
 
-To use a specific image tag (e.g. a language-pinned image you built):
+Use the pipe form with `-s --` to forward arguments to `claude`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/claude-sandbox.sh | bash -s -- --resume
+```
+
+Any flags after `--` are passed directly to the `claude` invocation inside the container.
+
+### Using a specific image tag
+
+To use a language-pinned image:
 
 ```bash
 CS_IMAGE_TAG=go-1.25.10 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/claude-sandbox.sh)"
