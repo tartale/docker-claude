@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Chromium (for headless browser testing with Playwright/Puppeteer)
+apt-get update
+apt-get install -y chromium
+rm -rf /var/lib/apt/lists/*
+
 # TypeScript (React projects are almost exclusively TypeScript)
 npm install -g \
   typescript \

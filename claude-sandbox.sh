@@ -33,7 +33,13 @@ fi
 CS_ENV_FILE="${CS_ENV_FILE:-.env}"
 ENV_ARGS=()
 if [ -f "$CS_ENV_FILE" ]; then
-    ENV_ARGS=(--env-file "$CS_ENV_FILE")
+    set -a
+    # shellcheck source=/dev/null
+    source "$CS_ENV_FILE"
+    set +a
+    while IFS='=' read -r key _; do
+        ENV_ARGS+=(-e "$key")
+    done < <(grep -Ev '^\s*(#|$)' "$CS_ENV_FILE" | sed 's/^export //')
 fi
 
 docker run -it --rm \
