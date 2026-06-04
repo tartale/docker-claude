@@ -17,6 +17,9 @@ if [ -n "$PLUGINS" ]; then
     install-plugins.sh "$PLUGINS"
 fi
 
+CLAUDE_ARGS=$(printf '%q ' "$@")
+export CLAUDE_ARGS
+
 su -m -s /bin/bash claude << 'EOF'
 set -e
 export HOME=/home/claude
@@ -41,5 +44,5 @@ cfg.projects['/workspace'].hasTrustDialogAccepted = true;
 fs.writeFileSync(cfgPath, JSON.stringify(cfg));
 "
 
-exec claude --dangerously-skip-permissions
+eval "exec claude --dangerously-skip-permissions $CLAUDE_ARGS"
 EOF
