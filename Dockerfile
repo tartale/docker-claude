@@ -12,6 +12,7 @@ RUN apt-get update \
       doas \
       gh \
       git \
+      git-lfs \
       jq \
       less \
       make \
