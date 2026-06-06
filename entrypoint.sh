@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-export GITHUB_TOKEN="$CS_GITHUB_TOKEN"
+GITHUB_TOKEN="$CS_GITHUB_TOKEN"
 
 existing_group=$(getent group "${CGID}" 2>/dev/null | cut -d: -f1)
 if [ -n "$existing_group" ] && [ "$existing_group" != "claude" ]; then
@@ -19,6 +19,14 @@ if [ -n "$PLUGINS" ]; then
     install-plugins.sh "$PLUGINS"
 fi
 
+printf '[url "https://github.com/"]\n\tinsteadOf = git@github.com:\n' > /tmp/gitconfig
+if [ -n "$GITHUB_TOKEN" ]; then
+    printf '#!/bin/sh\necho username=x-access-token\necho password=%s\n' "$GITHUB_TOKEN" > /tmp/git-credential-github-token
+    chmod +x /tmp/git-credential-github-token
+    printf '[credential "https://github.com"]\n\thelper = /tmp/git-credential-github-token\n' >> /tmp/gitconfig
+fi
+chmod a+r /tmp/gitconfig
+
 CLAUDE_ARGS=$(printf '%q ' "$@")
 export CLAUDE_ARGS
 
@@ -27,12 +35,6 @@ set -e
 export HOME=/home/claude
 umask ${CMASK}
 
-printf '[url "https://github.com/"]\n\tinsteadOf = git@github.com:\n' > /tmp/gitconfig
-if [ -n "$GITHUB_TOKEN" ]; then
-    printf '#!/bin/sh\necho username=x-access-token\necho password=%s\n' "$GITHUB_TOKEN" > /tmp/git-credential-github-token
-    chmod +x /tmp/git-credential-github-token
-    printf '[credential "https://github.com"]\n\thelper = /tmp/git-credential-github-token\n' >> /tmp/gitconfig
-fi
 export GIT_CONFIG_GLOBAL=/tmp/gitconfig
 
 node -e "
