@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Chromium (for headless browser testing with Playwright/Puppeteer)
 apt-get update
-apt-get install -y chromium
+apt-get install -y chromium firefox-esr
 rm -rf /var/lib/apt/lists/*
 
 # TypeScript (React projects are almost exclusively TypeScript)
