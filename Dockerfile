@@ -41,6 +41,7 @@ RUN chown claude:claude /workspace
 
 COPY plugins/install.sh /usr/local/bin/install-plugins.sh
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/install-plugins.sh /usr/local/bin/entrypoint.sh
 
 ARG LANGUAGE_VERSIONS=""
 ARG PLUGINS=""
