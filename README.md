@@ -37,6 +37,43 @@ To use a language-pinned image:
 CS_IMAGE_TAG=go-1.25.10 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/claude-sandbox.sh)"
 ```
 
+## Building a custom image
+
+To build a custom image with plugins, run this one-liner — no repo checkout needed:
+
+```bash
+CS_IMAGE_TAG=my-sandbox /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
+```
+
+Then launch it by setting `CS_IMAGE_TAG` to match:
+
+```bash
+CS_IMAGE_TAG=my-sandbox /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/claude-sandbox.sh)"
+```
+
+### Build environment variables
+
+| Variable | Description |
+|---|---|
+| `CS_IMAGE_TAG` | Tag for the built image (default: `custom`) |
+| `PLUGINS` | Built-in plugin name, local path, or URL (see [Plugins](#plugins) below) |
+| `LANGUAGE_VERSIONS` | Space-separated `<language>-<version>` pins (e.g. `"go-1.25.10"`) |
+| `CLAUDE_VERSION` | Claude Code version to bake in (default: latest) |
+
+```bash
+# Built-in language plugin
+PLUGINS=python3 CS_IMAGE_TAG=my-python /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
+
+# Built-in plugin with version pin
+PLUGINS=go LANGUAGE_VERSIONS="go-1.24.0" CS_IMAGE_TAG=go-1.24 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
+
+# Local custom plugin script
+PLUGINS=./my-tools.sh CS_IMAGE_TAG=my-tools /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
+
+# Remote custom plugin script
+PLUGINS=https://example.com/my-tools.sh CS_IMAGE_TAG=my-tools /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
+```
+
 ## Plugins
 
 Plugins are shell scripts that install additional tools into the sandbox. The `plugins/` directory contains ready-made language packs:
@@ -56,22 +93,26 @@ All plugins default to the latest stable version. See [Pinning a language versio
 
 ### Using a single plugin
 
-Pass the path to a script as `PLUGINS` when building the image:
+Pass a built-in name or path via `PLUGINS`:
 
 ```bash
+# no repo checkout needed
+PLUGINS=go CS_IMAGE_TAG=my-go /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
+
+# or with a local repo checkout
 PLUGINS=plugins/languages/go.sh CS_IMAGE_TAG=my-tag make image
 ```
 
 ### Pinning a language version
 
-Pass `LANGUAGE_VERSIONS` as a space-separated list of `<language>-<version>` entries. Each plugin extracts only its own entry, so this works for both single plugins and directories:
+Pass `LANGUAGE_VERSIONS` as a space-separated list of `<language>-<version>` entries. Each plugin extracts only its own entry:
 
 ```bash
-# single plugin
-PLUGINS=plugins/languages/go.sh CS_IMAGE_TAG=go-1.25.10 LANGUAGE_VERSIONS="go-1.25.10" make image
+# no repo checkout needed
+PLUGINS=go LANGUAGE_VERSIONS="go-1.25.10" CS_IMAGE_TAG=go-1.25.10 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
 
-# plugin directory — each plugin picks its own version
-PLUGINS=plugins/languages CS_IMAGE_TAG=my-tag LANGUAGE_VERSIONS="go-1.25.10" make image
+# with a local repo checkout
+PLUGINS=plugins/languages/go.sh CS_IMAGE_TAG=go-1.25.10 LANGUAGE_VERSIONS="go-1.25.10" make image
 ```
 
 When a plugin's entry is absent from `LANGUAGE_VERSIONS`, it installs the latest stable version.
@@ -83,9 +124,13 @@ Notes:
 
 ### Using multiple plugins
 
-Pass a directory of `.sh` scripts to run all of them, in alphabetical order:
+Point `PLUGINS` at a local directory of `.sh` scripts to run all of them, in alphabetical order:
 
 ```bash
+# no repo checkout needed
+PLUGINS=./my-plugins/ CS_IMAGE_TAG=my-tag /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
+
+# with a local repo checkout
 PLUGINS=plugins/languages CS_IMAGE_TAG=my-tag make image
 ```
 
@@ -105,12 +150,12 @@ The script runs as root during `docker build`, so standard `apt-get` installs wo
 
 ### Composing built-in plugins
 
-`PLUGINS_DIR` is pre-populated with the path to the root of the `plugins/` directory. A custom plugin placed inside `plugins/languages/` can use it to source other language plugins by path.
+`PLUGINS_DIR` is pre-populated with the path to the root of the `plugins/` directory. A custom plugin can use it to source built-in language plugins by path.
 
 **Example — a Go + React stack:**
 
 ```bash
-# plugins/languages/go-react.sh
+# go-react.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -119,14 +164,18 @@ bash "$PLUGINS_DIR/languages/react.sh"
 ```
 
 ```bash
+# no repo checkout needed
+PLUGINS=./go-react.sh CS_IMAGE_TAG=go-react /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
+
+# with a local repo checkout
 PLUGINS=plugins/languages/go-react.sh CS_IMAGE_TAG=go-react make image
 ```
 
 Each sourced plugin respects `LANGUAGE_VERSIONS`, so you can still pin versions:
 
 ```bash
-PLUGINS=plugins/languages/go-react.sh CS_IMAGE_TAG=go-react \
-  LANGUAGE_VERSIONS="go-1.25.10" make image
+PLUGINS=./go-react.sh CS_IMAGE_TAG=go-react \
+  LANGUAGE_VERSIONS="go-1.25.10" /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tartale/claude-sandbox/refs/heads/main/build-image.sh)"
 ```
 
 ### Runtime plugins
