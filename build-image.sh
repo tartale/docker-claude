@@ -3,7 +3,6 @@ set -euo pipefail
 
 REPO="tartale/claude-sandbox"
 BRANCH="main"
-RAW_BASE="https://raw.githubusercontent.com/${REPO}/refs/heads/${BRANCH}"
 
 CS_IMAGE_TAG="${CS_IMAGE_TAG:-custom}"
 CS_IMAGE="tartale/claude-sandbox:${CS_IMAGE_TAG}"
@@ -16,17 +15,9 @@ trap 'rm -rf "$BUILD_DIR"' EXIT
 
 echo "Fetching build files from ${REPO}@${BRANCH}..."
 
-curl -fsSL "$RAW_BASE/Dockerfile"        > "$BUILD_DIR/Dockerfile"
-curl -fsSL "$RAW_BASE/entrypoint.sh"     > "$BUILD_DIR/entrypoint.sh"
-
-mkdir -p "$BUILD_DIR/plugins/languages"
-curl -fsSL "$RAW_BASE/plugins/install.sh" > "$BUILD_DIR/plugins/install.sh"
-
-# Always fetch built-in language plugins so custom plugins can compose them
-for lang in cpp go java python2 python3 react ruby rust typescript; do
-    curl -fsSL "$RAW_BASE/plugins/languages/${lang}.sh" \
-        > "$BUILD_DIR/plugins/languages/${lang}.sh"
-done
+# Download as a tarball to preserve git file permissions (100755 on scripts)
+curl -fsSL "https://api.github.com/repos/${REPO}/tarball/${BRANCH}" \
+    | tar -xz --strip-components=1 -C "$BUILD_DIR"
 
 # Resolve PLUGINS to a path relative to BUILD_DIR
 PLUGINS_ARG=""
@@ -35,16 +26,19 @@ if [ -n "$PLUGINS" ]; then
         # Remote URL — download into a subdirectory so PLUGINS_DIR resolves correctly
         mkdir -p "$BUILD_DIR/plugins/custom"
         curl -fsSL "$PLUGINS" > "$BUILD_DIR/plugins/custom/plugin.sh"
+        chmod +x "$BUILD_DIR/plugins/custom/plugin.sh"
         PLUGINS_ARG="plugins/custom/plugin.sh"
     elif [ -d "$PLUGINS" ]; then
         # Local directory — copy all .sh files into custom/
         mkdir -p "$BUILD_DIR/plugins/custom"
         find "$PLUGINS" -maxdepth 1 -name '*.sh' -exec cp {} "$BUILD_DIR/plugins/custom/" \;
+        chmod +x "$BUILD_DIR/plugins/custom/"*.sh 2>/dev/null || true
         PLUGINS_ARG="plugins/custom"
     elif [ -f "$PLUGINS" ]; then
         # Local file
         mkdir -p "$BUILD_DIR/plugins/custom"
         cp "$PLUGINS" "$BUILD_DIR/plugins/custom/plugin.sh"
+        chmod +x "$BUILD_DIR/plugins/custom/plugin.sh"
         PLUGINS_ARG="plugins/custom/plugin.sh"
     else
         # Built-in plugin name (e.g. "python3", "go")

@@ -45,9 +45,8 @@ RUN chmod +x /usr/local/bin/install-plugins.sh /usr/local/bin/entrypoint.sh
 
 ARG LANGUAGE_VERSIONS=""
 ARG PLUGINS=""
-RUN --mount=type=bind,target=/build,rw \
+RUN --mount=type=bind,target=/build \
     if [ -n "$PLUGINS" ]; then \
-        find /build/plugins -name '*.sh' -exec chmod +x {} + 2>/dev/null || true; \
         install-plugins.sh "/build/$PLUGINS"; \
     fi
 
