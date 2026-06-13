@@ -66,4 +66,6 @@ BUILD_ARGS=(
 
 echo "Building ${CS_IMAGE}..."
 docker build "${BUILD_ARGS[@]}" "$BUILD_DIR"
-echo "Done. Image built: ${CS_IMAGE}"
+echo "Pushing ${CS_IMAGE}..."
+docker push "$CS_IMAGE"
+echo "Done. Image pushed: ${CS_IMAGE}"
