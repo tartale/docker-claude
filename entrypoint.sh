@@ -2,6 +2,7 @@
 set -e
 
 GITHUB_TOKEN="$CS_GITHUB_TOKEN"
+export GH_TOKEN="$CS_GITHUB_TOKEN"
 
 existing_group=$(getent group "${CGID}" 2>/dev/null | cut -d: -f1)
 if [ -n "$existing_group" ] && [ "$existing_group" != "claude" ]; then
