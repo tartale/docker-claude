@@ -16,13 +16,11 @@ trap 'rm -rf "$BUILD_DIR"' EXIT
 
 echo "Fetching build files from ${REPO}@${BRANCH}..."
 
-curl -fsSL "$RAW_BASE/Dockerfile"         > "$BUILD_DIR/Dockerfile"
-curl -fsSL "$RAW_BASE/entrypoint.sh"      > "$BUILD_DIR/entrypoint.sh"
-chmod +x "$BUILD_DIR/entrypoint.sh"
+curl -fsSL "$RAW_BASE/Dockerfile"        > "$BUILD_DIR/Dockerfile"
+curl -fsSL "$RAW_BASE/entrypoint.sh"     > "$BUILD_DIR/entrypoint.sh"
 
 mkdir -p "$BUILD_DIR/plugins/languages"
 curl -fsSL "$RAW_BASE/plugins/install.sh" > "$BUILD_DIR/plugins/install.sh"
-chmod +x "$BUILD_DIR/plugins/install.sh"
 
 # Always fetch built-in language plugins so custom plugins can compose them
 for lang in cpp go java python2 python3 react ruby rust typescript; do
